@@ -1,10 +1,26 @@
 const express = require('express');
 const socket = require('socket.io')
+const session = require('express-session');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const app= express();
 
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(express.static('public'));
+
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 3000000,
+      sameSite: true,
+    },
+  }));  
+
 
 dotenv.config();
 
@@ -30,6 +46,6 @@ io.on('connection', (socket) =>{
     })
 });
 
-app.get('/', (req,res)=>{
-    res.render('index')
-})
+app.use('/', require('./routes/home_chatroom'));
+app.use('/login',require('./routes/loginxlogout'));
+app.use('/register', require('./routes/register'));
